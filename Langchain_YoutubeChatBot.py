@@ -22,7 +22,7 @@ st.caption("Paste a YouTube link, then ask questions about its content.")
 # models are cached so they are not reloaded on every rerun
 @st.cache_resource
 def load_llm():
-    return ChatGroq(model="llama-3.1-8b-instant", api_key=os.getenv("GROQ_API_KEY"))
+    return ChatGroq(model="llama-3.1-8b-instant", groq_api_key = os.getenv("GROQ_API_KEY") or st.secrets.get("GROQ_API_KEY"))
 
 @st.cache_resource
 def load_embeddings():
