@@ -12,12 +12,26 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 from langchain_core.documents import Document
 from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api.proxies import WebshareProxyConfig
 
 load_dotenv()
 
 st.set_page_config(page_title="YouTube RAG Assistant", layout="centered")
 st.title("YouTube AI Assistant")
 st.caption("Paste a YouTube link, then ask questions about its content.")
+
+webshare_username = os.getenv("WEBSHARE_USERNAME") or st.secrets.get("WEBSHARE_USERNAME")
+webshare_password = os.getenv("WEBSHARE_PASSWORD") or st.secrets.get("WEBSHARE_PASSWORD")
+
+def fetch_transcript(video_id: str):
+    ytt_api = YouTubeTranscriptApi(
+        proxy_config=WebshareProxyConfig(
+            proxy_username=webshare_username,
+            proxy_password=webshare_password,
+        )
+    )
+    fetched = ytt_api.fetch(video_id)
+    return " ".join(snippet.text for snippet in fetched)
 
 # models are cached so they are not reloaded on every rerun
 @st.cache_resource
